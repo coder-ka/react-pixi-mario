@@ -160,38 +160,38 @@ export default function App() {
               y: marioVelocity.y + gravity,
             };
 
-            const topCollision = groundsTileMatrix.getTopCollision(
-              mario,
-              nextMario
-            );
+            const topCollision = groundsTileMatrix.getTopCollision({
+              from: mario,
+              to: nextMario,
+            });
 
             if (topCollision) {
               nextMario = setTop(topCollision.bottom + 1, nextMario);
               nextMarioVelocity.y = 0;
             }
 
-            const bottomCollision = groundsTileMatrix.getBottomCollision(
-              mario,
-              nextMario
-            );
+            const bottomCollision = groundsTileMatrix.getBottomCollision({
+              from: mario,
+              to: nextMario,
+            });
 
             if (bottomCollision) {
               nextMario = setBottom(bottomCollision.top - 1, nextMario);
               nextMarioVelocity.y = 0;
             }
 
-            const leftCollision = groundsTileMatrix.getLeftCollision(
-              mario,
-              nextMario
-            );
+            const leftCollision = groundsTileMatrix.getLeftCollision({
+              from: mario,
+              to: nextMario,
+            });
             if (leftCollision) {
               nextMario = setLeft(leftCollision.right + 1, nextMario);
             }
 
-            const rightCollision = groundsTileMatrix.getRightCollision(
-              mario,
-              nextMario
-            );
+            const rightCollision = groundsTileMatrix.getRightCollision({
+              from: mario,
+              to: nextMario,
+            });
             if (rightCollision) {
               nextMario = setRight(rightCollision.left - 1, nextMario);
             }

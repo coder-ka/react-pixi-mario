@@ -1,8 +1,14 @@
+import { Movement } from "./movement";
 import { Rect } from "./rect";
 
 export interface CollisionDetector {
-  getLeftCollision(from: Rect, to: Rect): Rect | undefined;
-  getRightCollision(from: Rect, to: Rect): Rect | undefined;
-  getTopCollision(from: Rect, to: Rect): Rect | undefined;
-  getBottomCollision(from: Rect, to: Rect): Rect | undefined;
+  getTopCollision(m: Movement<Rect>): Rect | undefined;
+  getBottomCollision(m: Movement<Rect>): Rect | undefined;
+  getLeftCollision(m: Movement<Rect>): Rect | undefined;
+  getRightCollision(m: Movement<Rect>): Rect | undefined;
+
+  getStaticTopCollision(r: Rect): Rect | undefined;
+  getStaticBottomCollision(r: Rect): Rect | undefined;
+  getStaticLeftCollision(r: Rect): Rect | undefined;
+  getStaticRightCollision(r: Rect): Rect | undefined;
 }

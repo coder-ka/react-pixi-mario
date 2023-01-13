@@ -1,20 +1,12 @@
 import { CollisionDetector } from "./collision-detection";
 import {
+  isMovingUp,
   isMovingDown,
   isMovingLeft,
   isMovingRight,
-  isMovingUp,
-  Rect,
-  setLeft,
-  setTop,
-} from "./rect";
-import {
-  // isMovingDown,
-  // isMovingLeft,
-  // isMovingRight,
-  // isMovingUp,
-  Vector,
-} from "./vector";
+} from "./movement";
+import { Rect, setLeft, setTop } from "./rect";
+import { Vector } from "./vector";
 
 type Cell = Rect;
 type Rows = Map<number, Cell>;
@@ -51,8 +43,6 @@ export function TileMatrix(
     }
   }
 
-  console.log(matrix);
-
   return {
     matrix,
     unitSize: size,
@@ -71,99 +61,93 @@ export function TileMatrix(
         return undefined;
       }
     },
-    getTopCollision(from, to) {
-      if (!isMovingUp(from, to)) return undefined;
+    getTopCollision(move) {
+      if (!isMovingUp(move)) return undefined;
       const xAxisCollision =
-        getLeftCollision(from, to, this) || getRightCollision(from, to, this);
+        (isMovingLeft(move) && this.getStaticLeftCollision(move.to)) ||
+        (isMovingRight(move) && this.getStaticRightCollision(move.to));
 
       return xAxisCollision
-        ? getTopCollision(from, setLeft(from.left, to), this)
-        : getTopCollision(from, to, this);
+        ? this.getStaticTopCollision(setLeft(move.from.left, move.to))
+        : this.getStaticTopCollision(move.to);
     },
-    getBottomCollision(from, to) {
-      if (!isMovingDown(from, to)) return undefined;
+    getBottomCollision(move) {
+      if (!isMovingDown(move)) return undefined;
       const xAxisCollision =
-        getLeftCollision(from, to, this) || getRightCollision(from, to, this);
+        (isMovingLeft(move) && this.getStaticLeftCollision(move.to)) ||
+        (isMovingRight(move) && this.getStaticRightCollision(move.to));
 
       return xAxisCollision
-        ? getBottomCollision(from, setLeft(from.left, to), this)
-        : getBottomCollision(from, to, this);
+        ? this.getStaticBottomCollision(setLeft(move.from.left, move.to))
+        : this.getStaticBottomCollision(move.to);
     },
-    getLeftCollision(from, to) {
-      if (!isMovingLeft(from, to)) return undefined;
+    getLeftCollision(move) {
+      if (!isMovingLeft(move)) return undefined;
       const yAxisCollision =
-        getTopCollision(from, to, this) || getBottomCollision(from, to, this);
+        (isMovingUp(move) && this.getStaticTopCollision(move.to)) ||
+        (isMovingDown(move) && this.getStaticBottomCollision(move.to));
 
       return yAxisCollision
-        ? getLeftCollision(from, setTop(from.top, to), this)
-        : getLeftCollision(from, to, this);
+        ? this.getStaticLeftCollision(setTop(move.from.top, move.to))
+        : this.getStaticLeftCollision(move.to);
     },
-    getRightCollision(from, to) {
-      if (!isMovingRight(from, to)) return undefined;
+    getRightCollision(move) {
+      if (!isMovingRight(move)) return undefined;
       const yAxisCollision =
-        getTopCollision(from, to, this) || getBottomCollision(from, to, this);
+        (isMovingUp(move) && this.getStaticTopCollision(move.to)) ||
+        (isMovingDown(move) && this.getStaticBottomCollision(move.to));
 
       return yAxisCollision
-        ? getRightCollision(from, setTop(from.top, to), this)
-        : getRightCollision(from, to, this);
+        ? this.getStaticRightCollision(setTop(move.from.top, move.to))
+        : this.getStaticRightCollision(move.to);
+    },
+    getStaticTopCollision(rect: Rect) {
+      return (
+        this.getCell({
+          x: Math.floor((rect.left - this.offset.x) / this.unitSize),
+          y: Math.floor((rect.top - this.offset.y) / this.unitSize),
+        }) ||
+        this.getCell({
+          x: Math.floor((rect.right - this.offset.x) / this.unitSize),
+          y: Math.floor((rect.top - this.offset.y) / this.unitSize),
+        })
+      );
+    },
+    getStaticBottomCollision(rect: Rect) {
+      return (
+        this.getCell({
+          x: Math.floor((rect.left - this.offset.x) / this.unitSize),
+          y: Math.floor((rect.bottom - this.offset.y) / this.unitSize),
+        }) ||
+        this.getCell({
+          x: Math.floor((rect.right - this.offset.x) / this.unitSize),
+          y: Math.floor((rect.bottom - this.offset.y) / this.unitSize),
+        })
+      );
+    },
+    getStaticLeftCollision(rect: Rect) {
+      return (
+        this.getCell({
+          x: Math.floor((rect.left - this.offset.x) / this.unitSize),
+          y: Math.floor((rect.top - this.offset.y) / this.unitSize),
+        }) ||
+        this.getCell({
+          x: Math.floor((rect.left - this.offset.x) / this.unitSize),
+          y: Math.floor((rect.bottom - this.offset.y) / this.unitSize),
+        })
+      );
+    },
+    getStaticRightCollision(rect: Rect) {
+      return (
+        this.getCell({
+          x: Math.floor((rect.right - this.offset.x) / this.unitSize),
+          y: Math.floor((rect.top - this.offset.y) / this.unitSize),
+        }) ||
+        this.getCell({
+          x: Math.floor((rect.right - this.offset.x) / this.unitSize),
+          y: Math.floor((rect.bottom - this.offset.y) / this.unitSize),
+        })
+      );
     },
   };
-}
-
-function getTopCollision(from: Rect, to: Rect, tileMatrix: TileMatrix) {
-  if (!isMovingUp(from, to)) return undefined;
-
-  return (
-    tileMatrix.getCell({
-      x: Math.floor((to.left - tileMatrix.offset.x) / tileMatrix.unitSize),
-      y: Math.floor((to.top - tileMatrix.offset.y) / tileMatrix.unitSize),
-    }) ||
-    tileMatrix.getCell({
-      x: Math.floor((to.right - tileMatrix.offset.x) / tileMatrix.unitSize),
-      y: Math.floor((to.top - tileMatrix.offset.y) / tileMatrix.unitSize),
-    })
-  );
-}
-
-function getBottomCollision(from: Rect, to: Rect, tileMatrix: TileMatrix) {
-  if (!isMovingDown(from, to)) return undefined;
-
-  return (
-    tileMatrix.getCell({
-      x: Math.floor((to.left - tileMatrix.offset.x) / tileMatrix.unitSize),
-      y: Math.floor((to.bottom - tileMatrix.offset.y) / tileMatrix.unitSize),
-    }) ||
-    tileMatrix.getCell({
-      x: Math.floor((to.right - tileMatrix.offset.x) / tileMatrix.unitSize),
-      y: Math.floor((to.bottom - tileMatrix.offset.y) / tileMatrix.unitSize),
-    })
-  );
-}
-
-function getLeftCollision(from: Rect, to: Rect, tileMatrix: TileMatrix) {
-  if (!isMovingLeft(from, to)) return undefined;
-  return (
-    tileMatrix.getCell({
-      x: Math.floor((to.left - tileMatrix.offset.x) / tileMatrix.unitSize),
-      y: Math.floor((to.top - tileMatrix.offset.y) / tileMatrix.unitSize),
-    }) ||
-    tileMatrix.getCell({
-      x: Math.floor((to.left - tileMatrix.offset.x) / tileMatrix.unitSize),
-      y: Math.floor((to.bottom - tileMatrix.offset.y) / tileMatrix.unitSize),
-    })
-  );
-}
-function getRightCollision(from: Rect, to: Rect, tileMatrix: TileMatrix) {
-  if (!isMovingRight(from, to)) return undefined;
-
-  return (
-    tileMatrix.getCell({
-      x: Math.floor((to.right - tileMatrix.offset.x) / tileMatrix.unitSize),
-      y: Math.floor((to.top - tileMatrix.offset.y) / tileMatrix.unitSize),
-    }) ||
-    tileMatrix.getCell({
-      x: Math.floor((to.right - tileMatrix.offset.x) / tileMatrix.unitSize),
-      y: Math.floor((to.bottom - tileMatrix.offset.y) / tileMatrix.unitSize),
-    })
-  );
 }
