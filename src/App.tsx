@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Container, Sprite, Stage, TilingSprite } from "@inlet/react-pixi";
 
 import { useTilesSpritesheet } from "./spritesheets/tiles-spritesheet";
@@ -98,15 +98,27 @@ export default function App() {
     x: 2,
     y: 0,
   });
+  const [jumping, setJumping] = useState(false);
   const keyboardState = useKeyboardState({
     use: ["ArrowLeft", "ArrowRight"],
   });
-  useKeydownEvent("Space", () => {
-    setMarioVelocity({
-      ...marioVelocity,
-      y: -5,
-    });
-  });
+  useKeydownEvent(
+    "Space",
+    () => {
+      if (!jumping) {
+        setMarioVelocity({
+          ...marioVelocity,
+          y: -5,
+        });
+        setJumping(true);
+      }
+    },
+    [jumping]
+  );
+
+  useEffect(() => {
+    debug(jumping);
+  }, [jumping]);
 
   if (!tilesSpritesheet || !charactersSpritesheet) return null;
 
@@ -150,8 +162,7 @@ export default function App() {
 
             let nextMario = setBottom(
               Math.floor(
-                mario.bottom +
-                  debug(Math.min(marioVelocity.y * delta, tileSize))
+                mario.bottom + Math.min(marioVelocity.y * delta, tileSize)
               ),
               setLeft(
                 Math.floor(mario.left + marioVelocity.x * direction * delta),
@@ -182,6 +193,7 @@ export default function App() {
             if (bottomCollision) {
               nextMario = setBottom(bottomCollision.top - 1, nextMario);
               nextMarioVelocity.y = 0;
+              setJumping(false);
             }
 
             const leftCollision = groundsTileMatrix.getLeftCollision({
@@ -199,6 +211,9 @@ export default function App() {
             if (rightCollision) {
               nextMario = setRight(rightCollision.left - 1, nextMario);
             }
+
+            nextMario = setLeft(Math.max(nextMario.left, 0), nextMario);
+            nextMario = setRight(Math.min(nextMario.right, width), nextMario);
 
             setMario(nextMario);
             setMarioVelocity(nextMarioVelocity);
