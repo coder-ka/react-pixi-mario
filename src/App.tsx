@@ -16,6 +16,7 @@ import { useKeydownEvent } from "./util/keydown-event";
 import { useVector } from "./util/vector";
 import { WithTick } from "./util/WithTick";
 import { TileMatrix } from "./util/tile-matrix";
+import { debug } from "./util/debug";
 
 export default function App() {
   const tileSize = 16;
@@ -148,7 +149,10 @@ export default function App() {
               : 0;
 
             let nextMario = setBottom(
-              Math.floor(mario.bottom + marioVelocity.y * delta),
+              Math.floor(
+                mario.bottom +
+                  debug(Math.min(marioVelocity.y * delta, tileSize))
+              ),
               setLeft(
                 Math.floor(mario.left + marioVelocity.x * direction * delta),
                 mario
