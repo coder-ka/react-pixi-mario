@@ -116,10 +116,6 @@ export default function App() {
     [jumping]
   );
 
-  useEffect(() => {
-    debug(jumping);
-  }, [jumping]);
-
   if (!tilesSpritesheet || !charactersSpritesheet) return null;
 
   return (
