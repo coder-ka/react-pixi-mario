@@ -16,18 +16,33 @@ export function useKeyboardState({ use }: { use: string[] }) {
   }>(initialState);
 
   useEffect(() => {
-    window.addEventListener("keydown", (e) => {
+    function onKeydown(e: KeyboardEvent) {
       if (use.includes(e.code)) {
         keyboardState.current[e.code] = { pressed: true };
         e.preventDefault();
       }
-    });
-    window.addEventListener("keyup", (e) => {
+    }
+    function onKeyup(e: KeyboardEvent) {
       if (use.includes(e.code)) {
         keyboardState.current[e.code] = { pressed: false };
         e.preventDefault();
       }
-    });
+    }
+    function onBlur() {
+      for (const key in keyboardState.current) {
+        keyboardState.current[key] = { pressed: false };
+      }
+    }
+
+    window.addEventListener("keydown", onKeydown);
+    window.addEventListener("keyup", onKeyup);
+    window.addEventListener("blur", onBlur);
+
+    return () => {
+      window.removeEventListener("keydown", onKeydown);
+      window.removeEventListener("keyup", onKeyup);
+      window.removeEventListener("blur", onBlur);
+    };
   }, []);
 
   return keyboardState;
