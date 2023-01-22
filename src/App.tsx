@@ -16,7 +16,6 @@ import { useKeydownEvent } from "./util/keydown-event";
 import { useVector } from "./util/vector";
 import { WithTick } from "./util/WithTick";
 import { TileMatrix } from "./util/tile-matrix";
-import { debug } from "./util/debug";
 
 export default function App() {
   const tileSize = 16;
@@ -99,11 +98,17 @@ export default function App() {
     y: 0,
   });
   const [jumping, setJumping] = useState(false);
-  const keyboardState = useKeyboardState({
+  const [keyboardState] = useKeyboardState({
     use: ["ArrowLeft", "ArrowRight"],
   });
+  const direction = keyboardState.get("ArrowRight")?.pressed
+    ? 1
+    : keyboardState.get("ArrowLeft")?.pressed
+    ? -1
+    : 0;
+
   useKeydownEvent(
-    "Space",
+    " ",
     () => {
       if (!jumping) {
         setMarioVelocity({
@@ -150,12 +155,6 @@ export default function App() {
 
         <WithTick
           onTick={(delta) => {
-            const direction = keyboardState.current["ArrowRight"].pressed
-              ? 1
-              : keyboardState.current["ArrowLeft"].pressed
-              ? -1
-              : 0;
-
             let nextMario = setBottom(
               Math.floor(
                 mario.bottom + Math.min(marioVelocity.y * delta, tileSize)

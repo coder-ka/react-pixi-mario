@@ -1,37 +1,46 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { Map } from "immutable";
 
-type KeyboardState = {
-  [code: KeyboardEvent["code"]]: { pressed: boolean };
-};
+type Key = KeyboardEvent["key"];
+type KeyState = { pressed: boolean };
 
-export function useKeyboardState({ use }: { use: string[] }) {
-  const initialState: KeyboardState = {};
-  for (const u of use) {
-    initialState[u] = {
-      pressed: false,
-    };
-  }
-  const keyboardState = useRef<{
-    [code: KeyboardEvent["code"]]: { pressed: boolean };
-  }>(initialState);
+export function useKeyboardState<UseKeyArray extends Key[]>({
+  use,
+}: {
+  use: UseKeyArray;
+}) {
+  type UseKeys = UseKeyArray[number];
+  const initialState = Map(
+    use.reduce(
+      (state, key) =>
+        state.set(key, {
+          pressed: false,
+        }),
+      Map<UseKeys, KeyState>({})
+    )
+  );
+
+  const [keyboardState, setKeyboardState] = useState(initialState);
 
   useEffect(() => {
     function onKeydown(e: KeyboardEvent) {
-      if (use.includes(e.code)) {
-        keyboardState.current[e.code] = { pressed: true };
+      if (use.includes(e.key)) {
+        setKeyboardState(keyboardState.set(e.key, { pressed: true }));
         e.preventDefault();
       }
     }
     function onKeyup(e: KeyboardEvent) {
-      if (use.includes(e.code)) {
-        keyboardState.current[e.code] = { pressed: false };
+      if (use.includes(e.key)) {
+        setKeyboardState(keyboardState.set(e.key, { pressed: false }));
         e.preventDefault();
       }
     }
     function onBlur() {
-      for (const key in keyboardState.current) {
-        keyboardState.current[key] = { pressed: false };
-      }
+      setKeyboardState(
+        keyboardState.map(() => ({
+          pressed: false,
+        }))
+      );
     }
 
     window.addEventListener("keydown", onKeydown);
@@ -43,7 +52,7 @@ export function useKeyboardState({ use }: { use: string[] }) {
       window.removeEventListener("keyup", onKeyup);
       window.removeEventListener("blur", onBlur);
     };
-  }, []);
+  }, [keyboardState]);
 
-  return keyboardState;
+  return [keyboardState] as const;
 }

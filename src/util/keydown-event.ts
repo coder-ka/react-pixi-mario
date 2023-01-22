@@ -1,13 +1,13 @@
 import { useEffect } from "react";
 
 export function useKeydownEvent(
-  code: KeyboardEvent["code"],
+  key: KeyboardEvent["key"],
   callback: (e: KeyboardEvent) => void,
   deps: unknown[] = []
 ) {
   useEffect(() => {
     function onKeydown(e: KeyboardEvent) {
-      if (e.code === code) {
+      if (e.key === key) {
         callback(e);
         e.preventDefault();
       }
