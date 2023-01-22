@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Container, Sprite, Stage, TilingSprite } from "@inlet/react-pixi";
 
 import { useTilesSpritesheet } from "./spritesheets/tiles-spritesheet";
