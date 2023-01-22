@@ -1,9 +1,9 @@
-import { CollisionDetector } from "./collision-detection";
 import {
   isMovingUp,
   isMovingDown,
   isMovingLeft,
   isMovingRight,
+  Movement,
 } from "./movement";
 import { Rect, setLeft, setTop } from "./rect";
 import { Vector } from "./vector";
@@ -15,7 +15,17 @@ type TileMatrix = {
   offset: Vector;
   matrix: Map<number, Rows>;
   getCell(v: Vector): Cell | undefined;
-} & CollisionDetector;
+
+  getTopCollision(m: Movement<Rect>): Cell | undefined;
+  getBottomCollision(m: Movement<Rect>): Cell | undefined;
+  getLeftCollision(m: Movement<Rect>): Cell | undefined;
+  getRightCollision(m: Movement<Rect>): Cell | undefined;
+
+  getStaticTopCollision(r: Rect): Cell | undefined;
+  getStaticBottomCollision(r: Rect): Cell | undefined;
+  getStaticLeftCollision(r: Rect): Cell | undefined;
+  getStaticRightCollision(r: Rect): Cell | undefined;
+};
 
 export function TileMatrix(
   rects: Rect[],
