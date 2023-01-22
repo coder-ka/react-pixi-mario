@@ -119,16 +119,3 @@ function normalize(part: Partial<Rect>): Rect {
         : 0,
   };
 }
-
-export function isMovingUp(from: Rect, to: Rect) {
-  return to.top < from.top;
-}
-export function isMovingDown(from: Rect, to: Rect) {
-  return to.top > from.top;
-}
-export function isMovingLeft(from: Rect, to: Rect) {
-  return to.left < from.left;
-}
-export function isMovingRight(from: Rect, to: Rect) {
-  return to.left > from.left;
-}
