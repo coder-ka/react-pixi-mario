@@ -12,7 +12,6 @@ import {
   useRects,
 } from "./util/rect";
 import { useKeyboardState } from "./util/keyboard-state";
-import { useKeydownEvent } from "./util/keydown-event";
 import { useVector } from "./util/vector";
 import { WithTick } from "./util/WithTick";
 import { TileMatrix } from "./util/tile-matrix";
@@ -113,27 +112,13 @@ export default function App() {
   });
   const [jumping, setJumping] = useState(false);
   const [keyboardState] = useKeyboardState({
-    use: ["ArrowLeft", "ArrowRight"],
+    use: ["ArrowLeft", "ArrowRight", " "],
   });
   const direction = keyboardState.get("ArrowRight")?.pressed
     ? 1
     : keyboardState.get("ArrowLeft")?.pressed
     ? -1
     : 0;
-
-  useKeydownEvent(
-    " ",
-    () => {
-      if (!jumping) {
-        setMarioVelocity({
-          ...marioVelocity,
-          y: -5,
-        });
-        setJumping(true);
-      }
-    },
-    [jumping]
-  );
 
   if (!tilesSpritesheet || !charactersSpritesheet) return null;
 
@@ -248,10 +233,16 @@ export default function App() {
                 }
               }
 
-              // console.log(nextMario.left - mario.left);
-
               setMario(nextMario);
-              setMarioVelocity(nextMarioVelocity);
+              if (!jumping && keyboardState.get(" ")?.pressed) {
+                setMarioVelocity({
+                  ...nextMarioVelocity,
+                  y: -5,
+                });
+                setJumping(true);
+              } else {
+                setMarioVelocity(nextMarioVelocity);
+              }
             }}
           >
             <Sprite
