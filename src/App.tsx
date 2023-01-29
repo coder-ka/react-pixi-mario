@@ -108,7 +108,7 @@ export default function App() {
   });
   const [gravity] = useState(0.5);
   const [marioVelocity, setMarioVelocity] = useVector({
-    x: 2,
+    x: 2.4,
     y: 0,
   });
   const [jumping, setJumping] = useState(false);
@@ -170,14 +170,16 @@ export default function App() {
 
           <WithTick
             onTick={(delta) => {
+              const deltaX = Math.floor(
+                Math.min(marioVelocity.x * delta, tileSize)
+              );
+              const deltaY = Math.floor(
+                Math.min(marioVelocity.y * delta, tileSize)
+              );
+
               let nextMario = setBottom(
-                Math.floor(
-                  mario.bottom + Math.min(marioVelocity.y * delta, tileSize)
-                ),
-                setLeft(
-                  Math.floor(mario.left + marioVelocity.x * direction * delta),
-                  mario
-                )
+                mario.bottom + deltaY,
+                setLeft(mario.left + deltaX * direction, mario)
               );
 
               let nextMarioVelocity = {
@@ -245,6 +247,8 @@ export default function App() {
                   });
                 }
               }
+
+              // console.log(nextMario.left - mario.left);
 
               setMario(nextMario);
               setMarioVelocity(nextMarioVelocity);
