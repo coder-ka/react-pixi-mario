@@ -179,7 +179,6 @@ export default function App() {
               };
 
               const topCollision = groundsTileMatrix.getTopCollision(marioMove);
-
               if (topCollision) {
                 nextMario = setTop(topCollision.bottom + 1, nextMario);
                 nextMarioVelocity.y = 0;
@@ -187,7 +186,6 @@ export default function App() {
 
               const bottomCollision =
                 groundsTileMatrix.getBottomCollision(marioMove);
-
               if (bottomCollision) {
                 nextMario = setBottom(bottomCollision.top - 1, nextMario);
                 nextMarioVelocity.y = 0;
