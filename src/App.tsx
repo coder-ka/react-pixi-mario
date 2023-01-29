@@ -46,9 +46,14 @@ export default function App() {
     height: worldHeight,
   });
 
+  const offset = {
+    x: 0,
+    y: 8,
+  };
+
   const [ground] = useRect({
     left: 0,
-    top: tileSize * 13 + 8,
+    top: tileSize * 13 + offset.y,
     width: worldWidth,
     height: tileSize * 2,
   });
@@ -56,42 +61,38 @@ export default function App() {
   const [grounds] = useRects([
     {
       left: tileSize * 0,
-      top: tileSize * 3 + 8,
+      top: tileSize * 3 + offset.y,
       width: tileSize * 3,
       height: tileSize * 1,
     },
     {
       left: tileSize * 5,
-      top: tileSize * 5 + 8,
+      top: tileSize * 5 + offset.y,
       width: tileSize * 3,
       height: tileSize * 1,
     },
     {
       left: tileSize * 10,
-      top: tileSize * 7 + 8,
+      top: tileSize * 7 + offset.y,
       width: tileSize * 3,
       height: tileSize * 1,
     },
     {
       left: tileSize * 15,
-      top: tileSize * 9 + 8,
+      top: tileSize * 9 + offset.y,
       width: tileSize * 3,
       height: tileSize * 1,
     },
     {
       left: tileSize * 20,
-      top: tileSize * 11 + 8,
+      top: tileSize * 11 + offset.y,
       width: tileSize * 3,
       height: tileSize * 2,
     },
   ]);
 
   const groundsTileMatrix = useMemo(
-    () =>
-      TileMatrix([ground, ...grounds], tileSize, {
-        x: 0,
-        y: 8,
-      }),
+    () => TileMatrix([ground, ...grounds], tileSize, offset),
     [ground, grounds]
   );
 
